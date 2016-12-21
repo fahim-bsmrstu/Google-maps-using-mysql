@@ -1,0 +1,94 @@
+
+<!DOCTYPE html >
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+	<meta http-equiv="refresh" content="15"/>
+	<style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+    <title>Bus Locator</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAo4vqW4lA3gzVhnvNbcyhzgMcjNxQXnL4"
+            type="text/javascript"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+
+    var customIcons = {
+      restaurant: {
+        icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png'
+      },
+      bar: {
+        icon: 'http://labs.google.com/ridefinder/images/mm_20_red.png'
+      }
+    };
+
+    function load() {
+      var map = new google.maps.Map(document.getElementById("map"), {
+        center: new google.maps.LatLng(22.965169, 89.816539),
+        zoom: 12,
+        mapTypeId: 'roadmap'
+      });
+	  
+
+      var infoWindow = new google.maps.InfoWindow;
+
+      // Change this depending on the name of your PHP file
+      downloadUrl("tower_server.php", function(data) {
+        var xml = data.responseXML;
+        var markers = xml.documentElement.getElementsByTagName("marker");
+        for (var i = 0; i < markers.length; i++) {
+          
+          
+          var point = new google.maps.LatLng(
+              parseFloat(markers[i].getAttribute("lat")),
+              parseFloat(markers[i].getAttribute("lng")));
+
+          var marker = new google.maps.Marker({
+            map: map,
+            position: point,
+            icon: 'mm_20_red.png'
+          });
+          
+        }
+      });
+    }
+
+    
+
+    function downloadUrl(url, callback) {
+      var request = window.ActiveXObject ?
+          new ActiveXObject('Microsoft.XMLHTTP') :
+          new XMLHttpRequest;
+
+      request.onreadystatechange = function() {
+        if (request.readyState == 4) {
+          request.onreadystatechange = doNothing;
+          callback(request, request.status);
+        }
+      };
+
+      request.open('POST', url, true);
+      request.send(null);
+    }
+
+    function doNothing() {}
+
+    //]]>
+
+  </script>
+
+  </head>
+
+  <body onload="load()">
+    <div id="map"></div>
+  </body>
+
+</html>
